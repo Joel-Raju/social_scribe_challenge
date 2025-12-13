@@ -43,16 +43,16 @@ defmodule SocialScribeWeb.ModalComponents do
             type="button"
             phx-click="toggle_contact_dropdown"
             phx-target={@target}
-            class="relative w-full bg-white border border-slate-200 rounded-lg pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            class="relative w-full bg-white border border-[#CACDCC] rounded-lg pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           >
             <span class="flex items-center">
               <.avatar firstname={@selected_contact.firstname} lastname={@selected_contact.lastname} size={:sm} />
-              <span class="ml-3 block truncate text-slate-900">
+              <span class="ml-1.5 block truncate text-slate-900">
                 {@selected_contact.firstname} {@selected_contact.lastname}
               </span>
             </span>
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <.icon name="hero-chevron-up-down" class="h-5 w-5 text-gray-400" />
+              <.icon name="hero-chevron-up-down" class="h-5 w-5 text-[#686F6F]" />
             </span>
           </button>
         <% else %>
@@ -67,13 +67,13 @@ defmodule SocialScribeWeb.ModalComponents do
               phx-focus="open_contact_dropdown"
               phx-debounce="150"
               autocomplete="off"
-              class="w-full bg-white border border-slate-200 rounded-lg pl-3 pr-10 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              class="w-full bg-white border border-[#CACDCC] rounded-lg pl-3 pr-10 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <%= if @loading do %>
-                <.icon name="hero-arrow-path" class="h-5 w-5 text-gray-400 animate-spin" />
+                <.icon name="hero-arrow-path" class="h-5 w-5 text-[#686F6F] animate-spin" />
               <% else %>
-                <.icon name="hero-chevron-up-down" class="h-5 w-5 text-gray-400" />
+                <.icon name="hero-chevron-up-down" class="h-5 w-5 text-[#686F6F]" />
               <% end %>
             </span>
           </div>
@@ -177,7 +177,7 @@ defmodule SocialScribeWeb.ModalComponents do
 
     ~H"""
     <div class={[
-      "rounded-full bg-slate-200 flex items-center justify-center font-medium text-slate-600 flex-shrink-0",
+      "rounded-full bg-[#C6CCD1] flex items-center justify-center font-semibold text-[#0C1216] flex-shrink-0",
       @size_class,
       @class
     ]}>
@@ -275,7 +275,7 @@ defmodule SocialScribeWeb.ModalComponents do
           value={@current_value || ""}
           placeholder="No existing value"
           class={[
-            "block w-full shadow-sm text-sm bg-white border border-transparent rounded-xl py-3 px-4",
+            "block w-full shadow-sm text-sm bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2",
             if(@current_value && @current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
           ]}
         />
@@ -288,7 +288,7 @@ defmodule SocialScribeWeb.ModalComponents do
           type="text"
           readonly
           value={@new_value}
-          class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-transparent rounded-xl py-3 px-4 focus:ring-blue-500 focus:border-blue-500"
+          class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
     </div>
@@ -307,7 +307,7 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def suggestion_card(assigns) do
     ~H"""
-    <div class={["bg-[#f5f8f7] border border-[#e4ece9] rounded-2xl p-6 mb-4", @class]}>
+    <div class={["bg-[#f5f8f7] rounded-2xl p-6 mb-4", @class]}>
       <div class="flex items-start justify-between">
         <div class="flex items-start gap-3">
           <div class="flex items-center h-5 pt-0.5">
@@ -315,7 +315,7 @@ defmodule SocialScribeWeb.ModalComponents do
               type="checkbox"
               checked={@suggestion.apply}
               phx-click={JS.dispatch("click", to: "#suggestion-apply-#{@suggestion.field}")}
-              class="h-5 w-5 rounded-[4px] border-slate-300 text-blue-600 accent-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+              class="h-4 w-4 rounded-[3px] border-slate-300 text-[#0871E8] accent-[#0871E8] focus:ring-0 focus:ring-offset-0 cursor-pointer"
             />
           </div>
           <div class="text-sm font-semibold text-slate-900 leading-5">{@suggestion.label}</div>
@@ -324,56 +324,56 @@ defmodule SocialScribeWeb.ModalComponents do
         <div class="flex items-center gap-4 pt-0.5">
           <span
             :if={@suggestion.apply}
-            class="inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-900"
+            class="inline-flex items-center rounded-full bg-[#E1E5EA] px-3 py-1 text-xs font-semibold text-[#121418]"
           >
             1 update selected
           </span>
-          <button type="button" class="text-sm text-slate-400 hover:text-slate-600 font-medium">
+          <button type="button" class="text-sm text-[#676B70] hover:text-[#565A5E] font-medium">
             Hide details
           </button>
         </div>
       </div>
 
       <div class="mt-4 pl-8">
-        <div class="text-sm font-medium text-slate-700 leading-5">{@suggestion.label}</div>
+        <div class="text-sm font-medium text-slate-700 leading-5 ml-1">{@suggestion.label}</div>
 
-        <div class="mt-3 grid grid-cols-[auto_1fr_auto_1fr] items-center gap-6">
-          <div class="flex items-center h-5 -ml-8">
+        <div class="relative mt-3">
+          <input
+            id={"suggestion-apply-#{@suggestion.field}"}
+            type="checkbox"
+            name={"apply[#{@suggestion.field}]"}
+            value={@suggestion.new_value}
+            checked={@suggestion.apply}
+            class="absolute -left-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-[3px] border-slate-300 text-[#0871E8] accent-[#0871E8] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+          />
+
+          <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
             <input
-              id={"suggestion-apply-#{@suggestion.field}"}
-              type="checkbox"
-              name={"apply[#{@suggestion.field}]"}
+              type="text"
+              readonly
+              value={@suggestion.current_value || ""}
+              placeholder="No existing value"
+              class={[
+                "block w-full shadow-sm text-sm bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2",
+                if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
+              ]}
+            />
+
+            <div class="text-[#6F7271]">
+              <.icon name="hero-arrow-long-right" class="h-8 w-8" />
+            </div>
+
+            <input
+              type="text"
+              readonly
               value={@suggestion.new_value}
-              checked={@suggestion.apply}
-              class="h-5 w-5 rounded-[4px] border-slate-300 text-blue-600 accent-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+              class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
-          <input
-            type="text"
-            readonly
-            value={@suggestion.current_value || ""}
-            placeholder="No existing value"
-            class={[
-              "block w-full shadow-sm text-sm bg-white border border-transparent rounded-xl py-3 px-4",
-              if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
-            ]}
-          />
-
-          <div class="text-slate-300">
-            <.icon name="hero-arrow-long-right" class="h-6 w-6" />
-          </div>
-
-          <input
-            type="text"
-            readonly
-            value={@suggestion.new_value}
-            class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-transparent rounded-xl py-3 px-4 focus:ring-blue-500 focus:border-blue-500"
-          />
         </div>
 
         <div class="mt-3 grid grid-cols-[1fr_auto_1fr] items-center">
-          <button type="button" class="text-sm text-[#1d4ed8] hover:text-[#1e40af] font-medium justify-self-start">
+          <button type="button" class="text-sm text-[#216FCC] hover:text-[#1B5CB0] font-medium justify-self-start">
             Update mapping
           </button>
           <span></span>
@@ -381,7 +381,7 @@ defmodule SocialScribeWeb.ModalComponents do
             Found in transcript
             <span
               :if={@suggestion[:context]}
-              class="ml-1 text-[#1d4ed8] hover:underline cursor-help"
+              class="ml-1 text-[#216FCC] hover:underline cursor-help"
               title={@suggestion.context}
             >
               (hover for context)
@@ -457,7 +457,7 @@ defmodule SocialScribeWeb.ModalComponents do
           :if={@cancel_patch}
           type="button"
           phx-click={Phoenix.LiveView.JS.patch(@cancel_patch)}
-          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-[#151515] bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Cancel
         </button>
@@ -465,7 +465,7 @@ defmodule SocialScribeWeb.ModalComponents do
           :if={@cancel_click}
           type="button"
           phx-click={@cancel_click}
-          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-[#151515] bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Cancel
         </button>
