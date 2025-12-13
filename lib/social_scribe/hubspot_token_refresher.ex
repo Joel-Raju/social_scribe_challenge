@@ -18,8 +18,9 @@ defmodule SocialScribe.HubspotTokenRefresher do
   Returns {:ok, response_body} with new access_token, refresh_token, and expires_in.
   """
   def refresh_token(refresh_token_string) do
-    client_id = Application.get_env(:social_scribe, :hubspot_client_id)
-    client_secret = Application.get_env(:social_scribe, :hubspot_client_secret)
+    config = Application.get_env(:ueberauth, Ueberauth.Strategy.Hubspot.OAuth, [])
+    client_id = config[:client_id]
+    client_secret = config[:client_secret]
 
     body = %{
       grant_type: "refresh_token",
