@@ -19,7 +19,7 @@ defmodule Ueberauth.Strategy.Hubspot do
     scopes = conn.params["scope"] || option(conn, :default_scope)
 
     opts =
-      [scope: scopes]
+      [scope: scopes, redirect_uri: callback_url(conn)]
       |> with_optional(:prompt, conn)
       |> with_param(:prompt, conn)
       |> with_state_param(conn)

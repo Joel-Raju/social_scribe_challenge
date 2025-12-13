@@ -52,6 +52,14 @@ defmodule Ueberauth.Strategy.Hubspot.OAuth do
   Fetches an access token from the HubSpot token endpoint.
   """
   def get_access_token(params \\ [], opts \\ []) do
+    config = Application.get_env(:ueberauth, __MODULE__, [])
+
+    # HubSpot requires client_id and client_secret in the body
+    params =
+      params
+      |> Keyword.put(:client_id, config[:client_id])
+      |> Keyword.put(:client_secret, config[:client_secret])
+
     case opts |> client() |> OAuth2.Client.get_token(params) do
       {:ok, %OAuth2.Client{token: %OAuth2.AccessToken{} = token}} ->
         {:ok, token}
@@ -61,6 +69,9 @@ defmodule Ueberauth.Strategy.Hubspot.OAuth do
 
       {:error, %OAuth2.Response{body: %{"error" => error, "error_description" => description}}} ->
         {:error, {error, description}}
+
+      {:error, %OAuth2.Response{body: %{"message" => message, "status" => status}}} ->
+        {:error, {status, message}}
 
       {:error, %OAuth2.Error{reason: reason}} ->
         {:error, {"oauth2_error", to_string(reason)}}
