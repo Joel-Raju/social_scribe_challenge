@@ -97,6 +97,44 @@ defmodule SocialScribeWeb.AuthController do
     end
   end
 
+  def callback(%{assigns: %{ueberauth_auth: auth, current_user: user}} = conn, %{
+        "provider" => "hubspot"
+      })
+      when not is_nil(user) do
+    Logger.info("HubSpot OAuth")
+    Logger.info(inspect(auth))
+
+    hub_id = to_string(auth.uid)
+
+    credential_attrs = %{
+      user_id: user.id,
+      provider: "hubspot",
+      uid: hub_id,
+      token: auth.credentials.token,
+      refresh_token: auth.credentials.refresh_token,
+      expires_at:
+        (auth.credentials.expires_at && DateTime.from_unix!(auth.credentials.expires_at)) ||
+          DateTime.add(DateTime.utc_now(), 3600, :second),
+      email: auth.info.email
+    }
+
+    case Accounts.find_or_create_hubspot_credential(user, credential_attrs) do
+      {:ok, _credential} ->
+        Logger.info("HubSpot account connected for user #{user.id}, hub_id: #{hub_id}")
+
+        conn
+        |> put_flash(:info, "HubSpot account connected successfully!")
+        |> redirect(to: ~p"/dashboard/settings")
+
+      {:error, reason} ->
+        Logger.error("Failed to save HubSpot credential: #{inspect(reason)}")
+
+        conn
+        |> put_flash(:error, "Could not connect HubSpot account.")
+        |> redirect(to: ~p"/dashboard/settings")
+    end
+  end
+
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     Logger.info("Google OAuth Login")
     Logger.info(auth)

@@ -36,6 +36,11 @@ config :social_scribe, :recall_api_key, System.get_env("RECALL_API_KEY")
 config :social_scribe, :recall_region, System.get_env("RECALL_REGION")
 config :social_scribe, :gemini_api_key, System.get_env("GEMINI_API_KEY")
 
+# HubSpot OAuth configuration (Ueberauth strategy)
+config :ueberauth, Ueberauth.Strategy.Hubspot.OAuth,
+  client_id: System.get_env("HUBSPOT_CLIENT_ID"),
+  client_secret: System.get_env("HUBSPOT_CLIENT_SECRET")
+
 if System.get_env("PHX_SERVER") do
   config :social_scribe, SocialScribeWeb.Endpoint, server: true
 end

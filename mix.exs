@@ -42,6 +42,7 @@ defmodule SocialScribe.MixProject do
       {:ueberauth_linkedin, "~> 0.10.8", hex: :ueberauth_linkedin_modern},
       {:ueberauth_facebook, "~> 0.10"},
       {:ueberauth, "~> 0.10.8"},
+      {:oauth2, "~> 2.0"},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.21"},
       {:phoenix_ecto, "~> 4.5"},
