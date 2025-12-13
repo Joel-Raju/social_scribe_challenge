@@ -4,6 +4,8 @@ defmodule SocialScribeWeb.ModalComponents do
   """
   use Phoenix.Component
 
+  alias Phoenix.LiveView.JS
+
   import SocialScribeWeb.CoreComponents, only: [icon: 1]
 
   @doc """
@@ -265,17 +267,20 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def value_comparison(assigns) do
     ~H"""
-    <div class={["flex items-center space-x-4", @class]}>
+    <div class={["flex items-center gap-6", @class]}>
       <div class="flex-1">
         <input
           type="text"
           readonly
           value={@current_value || ""}
           placeholder="No existing value"
-          class="block w-full shadow-sm text-sm text-gray-400 bg-white border-gray-200 rounded-md py-2 px-3 line-through"
+          class={[
+            "block w-full shadow-sm text-sm bg-white border border-transparent rounded-xl py-3 px-4",
+            if(@current_value && @current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
+          ]}
         />
       </div>
-      <div class="text-gray-300">
+      <div class="text-slate-300">
         <.icon name="hero-arrow-long-right" class="h-6 w-6" />
       </div>
       <div class="flex-1">
@@ -283,7 +288,7 @@ defmodule SocialScribeWeb.ModalComponents do
           type="text"
           readonly
           value={@new_value}
-          class="block w-full shadow-sm text-sm text-gray-900 border-gray-200 rounded-md py-2 px-3 focus:ring-blue-500 focus:border-blue-500"
+          class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-transparent rounded-xl py-3 px-4 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
     </div>
@@ -302,43 +307,83 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def suggestion_card(assigns) do
     ~H"""
-    <div class={["bg-slate-50 border border-slate-200 rounded-xl p-5 mb-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]", @class]}>
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-3">
-          <div class="flex items-center h-6">
+    <div class={["bg-[#f5f8f7] border border-[#e4ece9] rounded-2xl p-6 mb-4", @class]}>
+      <div class="flex items-start justify-between">
+        <div class="flex items-start gap-3">
+          <div class="flex items-center h-5 pt-0.5">
             <input
+              type="checkbox"
+              checked={@suggestion.apply}
+              phx-click={JS.dispatch("click", to: "#suggestion-apply-#{@suggestion.field}")}
+              class="h-5 w-5 rounded-[4px] border-slate-300 text-blue-600 accent-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
+            />
+          </div>
+          <div class="text-sm font-semibold text-slate-900 leading-5">{@suggestion.label}</div>
+        </div>
+
+        <div class="flex items-center gap-4 pt-0.5">
+          <span
+            :if={@suggestion.apply}
+            class="inline-flex items-center rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-900"
+          >
+            1 update selected
+          </span>
+          <button type="button" class="text-sm text-slate-400 hover:text-slate-600 font-medium">
+            Hide details
+          </button>
+        </div>
+      </div>
+
+      <div class="mt-4 pl-8">
+        <div class="text-sm font-medium text-slate-700 leading-5">{@suggestion.label}</div>
+
+        <div class="mt-3 grid grid-cols-[auto_1fr_auto_1fr] items-center gap-6">
+          <div class="flex items-center h-5 -ml-8">
+            <input
+              id={"suggestion-apply-#{@suggestion.field}"}
               type="checkbox"
               name={"apply[#{@suggestion.field}]"}
               value={@suggestion.new_value}
               checked={@suggestion.apply}
-              class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
+              class="h-5 w-5 rounded-[4px] border-slate-300 text-blue-600 accent-blue-600 focus:ring-0 focus:ring-offset-0 cursor-pointer"
             />
           </div>
-          <label class="text-sm font-semibold text-gray-900">{@suggestion.label}</label>
-        </div>
 
-        <div class="flex items-center gap-4">
-          <span :if={@suggestion.apply} class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800">
-            1 update selected
-          </span>
-          <button type="button" class="text-sm text-gray-400 hover:text-gray-600 font-medium">Hide details</button>
-        </div>
-      </div>
+          <input
+            type="text"
+            readonly
+            value={@suggestion.current_value || ""}
+            placeholder="No existing value"
+            class={[
+              "block w-full shadow-sm text-sm bg-white border border-transparent rounded-xl py-3 px-4",
+              if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
+            ]}
+          />
 
-      <div class="ml-8">
-        <div class="mt-3">
-          <.value_comparison
-            current_value={@suggestion.current_value}
-            new_value={@suggestion.new_value}
+          <div class="text-slate-300">
+            <.icon name="hero-arrow-long-right" class="h-6 w-6" />
+          </div>
+
+          <input
+            type="text"
+            readonly
+            value={@suggestion.new_value}
+            class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-transparent rounded-xl py-3 px-4 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
-        <div class="flex justify-between items-center pt-2">
-          <button type="button" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+
+        <div class="mt-3 grid grid-cols-[1fr_auto_1fr] items-center">
+          <button type="button" class="text-sm text-[#1d4ed8] hover:text-[#1e40af] font-medium justify-self-start">
             Update mapping
           </button>
-          <span class="text-xs text-gray-500">
+          <span></span>
+          <span class="text-xs text-slate-500 justify-self-start">
             Found in transcript
-            <span :if={@suggestion[:context]} class="ml-1 text-blue-500 hover:underline cursor-help" title={@suggestion.context}>
+            <span
+              :if={@suggestion[:context]}
+              class="ml-1 text-[#1d4ed8] hover:underline cursor-help"
+              title={@suggestion.context}
+            >
               (hover for context)
             </span>
           </span>
@@ -401,7 +446,8 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def modal_footer(assigns) do
     ~H"""
-    <div class={["pt-6 mt-6 border-t border-slate-200 flex items-center justify-between", @class]}>
+    <div class={["relative pt-6 mt-6 flex items-center justify-between -mx-14 px-14", @class]}>
+      <div class="absolute left-0 right-0 top-0 border-t border-slate-200"></div>
       <div :if={@info_text} class="text-xs text-slate-500">
         {@info_text}
       </div>
@@ -411,7 +457,7 @@ defmodule SocialScribeWeb.ModalComponents do
           :if={@cancel_patch}
           type="button"
           phx-click={Phoenix.LiveView.JS.patch(@cancel_patch)}
-          class="px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Cancel
         </button>
@@ -419,7 +465,7 @@ defmodule SocialScribeWeb.ModalComponents do
           :if={@cancel_click}
           type="button"
           phx-click={@cancel_click}
-          class="px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Cancel
         </button>
@@ -427,7 +473,7 @@ defmodule SocialScribeWeb.ModalComponents do
           type="submit"
           disabled={@loading}
           class={
-            "px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white " <>
+            "px-5 py-2.5 rounded-lg shadow-sm text-sm font-medium text-white " <>
               @submit_class <> " disabled:opacity-50"
           }
         >

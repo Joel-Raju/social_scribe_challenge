@@ -10,8 +10,8 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     ~H"""
     <div class="space-y-6">
       <div>
-        <h2 class="text-lg font-semibold text-slate-900">Update in HubSpot</h2>
-        <p class="mt-2 text-sm leading-6 text-slate-500">
+        <h2 class="text-2xl font-semibold tracking-tight text-slate-900">Update in HubSpot</h2>
+        <p class="mt-2 text-lg leading-7 text-slate-500">
           Here are suggested updates to sync with your integrations based on this meeting
         </p>
       </div>
