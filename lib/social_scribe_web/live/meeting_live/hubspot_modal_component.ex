@@ -1,0 +1,212 @@
+defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
+  use SocialScribeWeb, :live_component
+
+  import SocialScribeWeb.ModalComponents
+
+  @impl true
+  def render(assigns) do
+    assigns = assign(assigns, :patch, ~p"/dashboard/meetings/#{assigns.meeting}")
+
+    ~H"""
+    <div class="space-y-6">
+      <.header>
+        Update in HubSpot
+        <:subtitle>Here are suggested updates to sync with your integrations based on this meeting</:subtitle>
+      </.header>
+
+      <%= if @step == :success do %>
+        <.success_step contact={@selected_contact} applied_count={@applied_count} patch={@patch} />
+      <% else %>
+        <.contact_select
+          selected_contact={@selected_contact}
+          contacts={@contacts}
+          loading={@searching}
+          open={@dropdown_open}
+          query={@query}
+          target={@myself}
+          error={@error}
+        />
+
+        <%= if @selected_contact do %>
+          <.suggestions_section
+            suggestions={@suggestions}
+            loading={@loading}
+            myself={@myself}
+            patch={@patch}
+          />
+        <% end %>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :suggestions, :list, required: true
+  attr :loading, :boolean, required: true
+  attr :myself, :any, required: true
+  attr :patch, :string, required: true
+
+  defp suggestions_section(assigns) do
+    assigns = assign(assigns, :selected_count, Enum.count(assigns.suggestions, & &1.apply))
+
+    ~H"""
+    <div class="space-y-4">
+      <%= if @loading do %>
+        <div class="text-center py-8 text-slate-500">
+          <.icon name="hero-arrow-path" class="h-6 w-6 animate-spin mx-auto mb-2" />
+          <p>Generating suggestions...</p>
+        </div>
+      <% else %>
+        <%= if Enum.empty?(@suggestions) do %>
+          <.empty_state
+            message="No update suggestions found from this meeting."
+            submessage="The AI didn't detect any new contact information in the transcript."
+          />
+        <% else %>
+          <form phx-submit="apply_updates" phx-change="toggle_suggestion" phx-target={@myself}>
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+              <.suggestion_card :for={suggestion <- @suggestions} suggestion={suggestion} />
+            </div>
+
+            <.modal_footer
+              cancel_patch={@patch}
+              submit_text="Update HubSpot"
+              loading={@loading}
+              loading_text="Updating..."
+              info_text={"1 object, #{@selected_count} fields in 1 integration selected to update"}
+            />
+          </form>
+        <% end %>
+      <% end %>
+    </div>
+    """
+  end
+
+  attr :contact, :map, required: true
+  attr :applied_count, :integer, required: true
+  attr :patch, :string, required: true
+
+  defp success_step(assigns) do
+    ~H"""
+    <.success_message title="Updates Applied!">
+      Successfully updated {@applied_count} field(s) for
+      <span class="font-medium">{@contact.firstname} {@contact.lastname}</span>
+      <:actions>
+        <.link
+          patch={@patch}
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+        >
+          Done
+        </.link>
+      </:actions>
+    </.success_message>
+    """
+  end
+
+  @impl true
+  def update(assigns, socket) do
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign_new(:step, fn -> :search end)
+      |> assign_new(:query, fn -> "" end)
+      |> assign_new(:contacts, fn -> [] end)
+      |> assign_new(:selected_contact, fn -> nil end)
+      |> assign_new(:suggestions, fn -> [] end)
+      |> assign_new(:loading, fn -> false end)
+      |> assign_new(:searching, fn -> false end)
+      |> assign_new(:dropdown_open, fn -> false end)
+      |> assign_new(:error, fn -> nil end)
+      |> assign_new(:applied_count, fn -> 0 end)
+
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_event("contact_search", %{"value" => query}, socket) do
+    query = String.trim(query)
+
+    if String.length(query) >= 2 do
+      socket = assign(socket, searching: true, error: nil, query: query, dropdown_open: true)
+      send(self(), {:hubspot_search, query, socket.assigns.credential})
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, query: query, contacts: [], dropdown_open: query != "")}
+    end
+  end
+
+  @impl true
+  def handle_event("open_contact_dropdown", _params, socket) do
+    {:noreply, assign(socket, dropdown_open: true)}
+  end
+
+  @impl true
+  def handle_event("toggle_contact_dropdown", _params, socket) do
+    if socket.assigns.dropdown_open do
+      {:noreply, assign(socket, dropdown_open: false)}
+    else
+      # When opening dropdown with selected contact, search for similar contacts
+      socket = assign(socket, dropdown_open: true, searching: true)
+      query = "#{socket.assigns.selected_contact.firstname} #{socket.assigns.selected_contact.lastname}"
+      send(self(), {:hubspot_search, query, socket.assigns.credential})
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_event("select_contact", %{"id" => contact_id}, socket) do
+    contact = Enum.find(socket.assigns.contacts, &(&1.id == contact_id))
+
+    if contact do
+      socket = assign(socket,
+        loading: true,
+        selected_contact: contact,
+        error: nil,
+        dropdown_open: false,
+        query: "",
+        suggestions: []
+      )
+      send(self(), {:generate_suggestions, contact, socket.assigns.meeting, socket.assigns.credential})
+      {:noreply, socket}
+    else
+      {:noreply, assign(socket, error: "Contact not found")}
+    end
+  end
+
+  @impl true
+  def handle_event("toggle_suggestion", %{"apply" => applied_fields}, socket) do
+    checked_fields = Map.keys(applied_fields)
+
+    updated_suggestions =
+      Enum.map(socket.assigns.suggestions, fn suggestion ->
+        if suggestion.field in checked_fields do
+          %{suggestion | apply: true}
+        else
+          %{suggestion | apply: false}
+        end
+      end)
+
+    {:noreply, assign(socket, suggestions: updated_suggestions)}
+  end
+
+  @impl true
+  def handle_event("toggle_suggestion", _params, socket) do
+    updated_suggestions =
+      Enum.map(socket.assigns.suggestions, fn suggestion ->
+        %{suggestion | apply: false}
+      end)
+
+    {:noreply, assign(socket, suggestions: updated_suggestions)}
+  end
+
+  @impl true
+  def handle_event("apply_updates", %{"apply" => updates}, socket) do
+    socket = assign(socket, loading: true, error: nil)
+    send(self(), {:apply_hubspot_updates, updates, socket.assigns.selected_contact, socket.assigns.credential})
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("apply_updates", _params, socket) do
+    {:noreply, assign(socket, error: "Please select at least one field to update")}
+  end
+end

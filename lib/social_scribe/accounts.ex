@@ -312,8 +312,8 @@ defmodule SocialScribe.Accounts do
   @doc """
   Gets the user's HubSpot credential if one exists.
   """
-  def get_user_hubspot_credential(user) do
-    Repo.get_by(UserCredential, user_id: user.id, provider: "hubspot")
+  def get_user_hubspot_credential(user_id) do
+    Repo.get_by(UserCredential, user_id: user_id, provider: "hubspot")
   end
 
   defp get_user_by_oauth_uid(provider, uid) do
