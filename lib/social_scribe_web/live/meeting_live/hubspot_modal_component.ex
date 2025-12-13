@@ -9,10 +9,12 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
 
     ~H"""
     <div class="space-y-6">
-      <.header>
-        Update in HubSpot
-        <:subtitle>Here are suggested updates to sync with your integrations based on this meeting</:subtitle>
-      </.header>
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Update in HubSpot</h2>
+        <p class="mt-2 text-sm leading-6 text-slate-500">
+          Here are suggested updates to sync with your integrations based on this meeting
+        </p>
+      </div>
 
       <%= if @step == :success do %>
         <.success_step contact={@selected_contact} applied_count={@applied_count} patch={@patch} />
@@ -70,6 +72,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
             <.modal_footer
               cancel_patch={@patch}
               submit_text="Update HubSpot"
+              submit_class="bg-emerald-600 hover:bg-emerald-700"
               loading={@loading}
               loading_text="Updating..."
               info_text={"1 object, #{@selected_count} fields in 1 integration selected to update"}
@@ -107,6 +110,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     socket =
       socket
       |> assign(assigns)
+      |> maybe_select_all_suggestions(assigns)
       |> assign_new(:step, fn -> :search end)
       |> assign_new(:query, fn -> "" end)
       |> assign_new(:contacts, fn -> [] end)
@@ -120,6 +124,12 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
 
     {:ok, socket}
   end
+
+  defp maybe_select_all_suggestions(socket, %{suggestions: suggestions}) when is_list(suggestions) do
+    assign(socket, suggestions: Enum.map(suggestions, &Map.put(&1, :apply, true)))
+  end
+
+  defp maybe_select_all_suggestions(socket, _assigns), do: socket
 
   @impl true
   def handle_event("contact_search", %{"value" => query}, socket) do

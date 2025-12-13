@@ -4,7 +4,7 @@ defmodule SocialScribeWeb.ModalComponents do
   """
   use Phoenix.Component
 
-  import SocialScribeWeb.CoreComponents, only: [button: 1, icon: 1]
+  import SocialScribeWeb.CoreComponents, only: [icon: 1]
 
   @doc """
   Renders a searchable contact select box.
@@ -41,7 +41,7 @@ defmodule SocialScribeWeb.ModalComponents do
             type="button"
             phx-click="toggle_contact_dropdown"
             phx-target={@target}
-            class="relative w-full bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            class="relative w-full bg-white border border-slate-200 rounded-lg pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           >
             <span class="flex items-center">
               <.avatar firstname={@selected_contact.firstname} lastname={@selected_contact.lastname} size={:sm} />
@@ -65,7 +65,7 @@ defmodule SocialScribeWeb.ModalComponents do
               phx-focus="open_contact_dropdown"
               phx-debounce="150"
               autocomplete="off"
-              class="w-full bg-white border border-gray-300 rounded-md pl-3 pr-10 py-2.5 text-left focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              class="w-full bg-white border border-slate-200 rounded-lg pl-3 pr-10 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <%= if @loading do %>
@@ -265,25 +265,25 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def value_comparison(assigns) do
     ~H"""
-    <div class={["flex items-center space-x-3", @class]}>
+    <div class={["flex items-center space-x-4", @class]}>
       <div class="flex-1">
         <input
           type="text"
           readonly
           value={@current_value || ""}
           placeholder="No existing value"
-          class="block w-full shadow-sm sm:text-sm text-gray-400 bg-white border-gray-200 rounded-md line-through"
+          class="block w-full shadow-sm text-sm text-gray-400 bg-white border-gray-200 rounded-md py-2 px-3 line-through"
         />
       </div>
-      <div class="text-gray-400">
-        <.icon name="hero-arrow-long-right" class="h-5 w-5" />
+      <div class="text-gray-300">
+        <.icon name="hero-arrow-long-right" class="h-6 w-6" />
       </div>
       <div class="flex-1">
         <input
           type="text"
           readonly
           value={@new_value}
-          class="block w-full shadow-sm sm:text-sm text-gray-900 border-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          class="block w-full shadow-sm text-sm text-gray-900 border-gray-200 rounded-md py-2 px-3 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
     </div>
@@ -302,36 +302,38 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def suggestion_card(assigns) do
     ~H"""
-    <div class={["bg-white border border-gray-100 rounded-xl p-5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]", @class]}>
+    <div class={["bg-slate-50 border border-slate-200 rounded-xl p-5 mb-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]", @class]}>
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
-          <div class="flex items-center h-5">
+          <div class="flex items-center h-6">
             <input
               type="checkbox"
               name={"apply[#{@suggestion.field}]"}
               value={@suggestion.new_value}
               checked={@suggestion.apply}
-              class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
+              class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
             />
           </div>
-          <label class="text-base font-semibold text-gray-900">{@suggestion.label}</label>
+          <label class="text-sm font-semibold text-gray-900">{@suggestion.label}</label>
         </div>
 
         <div class="flex items-center gap-4">
-          <span :if={@suggestion.apply} class="inline-flex items-center rounded-md bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800">
+          <span :if={@suggestion.apply} class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-800">
             1 update selected
           </span>
+          <button type="button" class="text-sm text-gray-400 hover:text-gray-600 font-medium">Hide details</button>
         </div>
       </div>
 
-      <div class="ml-8 space-y-3">
-        <div class="text-sm font-semibold text-gray-900">{@suggestion.label}</div>
-        <.value_comparison
-          current_value={@suggestion.current_value}
-          new_value={@suggestion.new_value}
-        />
-        <div class="flex justify-between items-center pt-1">
-          <button type="button" class="text-sm text-blue-500 hover:text-blue-600 font-medium">
+      <div class="ml-8">
+        <div class="mt-3">
+          <.value_comparison
+            current_value={@suggestion.current_value}
+            new_value={@suggestion.new_value}
+          />
+        </div>
+        <div class="flex justify-between items-center pt-2">
+          <button type="button" class="text-sm text-blue-600 hover:text-blue-700 font-medium">
             Update mapping
           </button>
           <span class="text-xs text-gray-500">
@@ -400,7 +402,7 @@ defmodule SocialScribeWeb.ModalComponents do
   def modal_footer(assigns) do
     ~H"""
     <div class={["pt-6 mt-6 border-t border-slate-200 flex items-center justify-between", @class]}>
-      <div :if={@info_text} class="text-sm text-slate-500">
+      <div :if={@info_text} class="text-xs text-slate-500">
         {@info_text}
       </div>
       <div :if={!@info_text}></div>
@@ -421,10 +423,17 @@ defmodule SocialScribeWeb.ModalComponents do
         >
           Cancel
         </button>
-        <.button type="submit" disabled={@loading} class={"#{@submit_class} text-white border-transparent"}>
+        <button
+          type="submit"
+          disabled={@loading}
+          class={
+            "px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white " <>
+              @submit_class <> " disabled:opacity-50"
+          }
+        >
           <span :if={@loading}>{@loading_text}</span>
           <span :if={!@loading}>{@submit_text}</span>
-        </.button>
+        </button>
       </div>
     </div>
     """
