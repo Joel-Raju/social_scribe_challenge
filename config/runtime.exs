@@ -5,7 +5,8 @@ import Config
 # system starts, so it is typically used to load production configuration
 # and secrets from environment variables or elsewhere. Do not define
 # any compile-time configuration in here, as it won't be applied.
-# The block below contains prod specific runtime configuration.
+#
+# For dev: run `source .env && mix phx.server`
 
 # ## Using releases
 #
@@ -36,7 +37,6 @@ config :social_scribe, :recall_api_key, System.get_env("RECALL_API_KEY")
 config :social_scribe, :recall_region, System.get_env("RECALL_REGION")
 config :social_scribe, :gemini_api_key, System.get_env("GEMINI_API_KEY")
 
-# HubSpot OAuth configuration (Ueberauth strategy)
 config :ueberauth, Ueberauth.Strategy.Hubspot.OAuth,
   client_id: System.get_env("HUBSPOT_CLIENT_ID"),
   client_secret: System.get_env("HUBSPOT_CLIENT_SECRET")
