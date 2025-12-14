@@ -15,6 +15,25 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
+        hubspot: {
+          overlay: "#B1B1B1",
+          card: "#f5f8f7",
+          input: "#CACDCC",
+          icon: "#686F6F",
+          checkbox: "#0871E8",
+          pill: "#E1E5EA",
+          "pill-text": "#121418",
+          link: "#216FCC",
+          "link-hover": "#1B5CB0",
+          hide: "#676B70",
+          "hide-hover": "#565A5E",
+          cancel: "#151515",
+          button: "#00B669",
+          "button-hover": "#009A59",
+          arrow: "#6F7271",
+          avatar: "#C6CCD1",
+          "avatar-text": "#0C1216",
+        }
       }
     },
   },

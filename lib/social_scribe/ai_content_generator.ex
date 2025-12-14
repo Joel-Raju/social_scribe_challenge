@@ -133,41 +133,43 @@ defmodule SocialScribe.AIContentGenerator do
   end
 
   defp call_gemini(prompt_text) do
-    api_key = Application.fetch_env!(:social_scribe, :gemini_api_key)
-    path = "/#{@gemini_model}:generateContent?key=#{api_key}"
+    api_key = Application.get_env(:social_scribe, :gemini_api_key)
 
-    payload = %{
-      contents: [
-        %{
-          parts: [%{text: prompt_text}]
-        }
-      ]
-    }
+    if is_nil(api_key) or api_key == "" do
+      {:error, {:config_error, "Gemini API key is missing - set GEMINI_API_KEY env var"}}
+    else
+      path = "/#{@gemini_model}:generateContent?key=#{api_key}"
 
-    case Tesla.post(client(), path, payload) do
-      {:ok, %Tesla.Env{status: 200, body: body}} ->
-        # Safely extract the text content
-        # The response structure is typically: body.candidates[0].content.parts[0].text
-
-        text_path = [
-          "candidates",
-          Access.at(0),
-          "content",
-          "parts",
-          Access.at(0),
-          "text"
+      payload = %{
+        contents: [
+          %{
+            parts: [%{text: prompt_text}]
+          }
         ]
+      }
 
-        case get_in(body, text_path) do
-          nil -> {:error, {:parsing_error, "No text content found in Gemini response", body}}
-          text_content -> {:ok, text_content}
-        end
+      case Tesla.post(client(), path, payload) do
+        {:ok, %Tesla.Env{status: 200, body: body}} ->
+          text_path = [
+            "candidates",
+            Access.at(0),
+            "content",
+            "parts",
+            Access.at(0),
+            "text"
+          ]
 
-      {:ok, %Tesla.Env{status: status, body: error_body}} ->
-        {:error, {:api_error, status, error_body}}
+          case get_in(body, text_path) do
+            nil -> {:error, {:parsing_error, "No text content found in Gemini response", body}}
+            text_content -> {:ok, text_content}
+          end
 
-      {:error, reason} ->
-        {:error, {:http_error, reason}}
+        {:ok, %Tesla.Env{status: status, body: error_body}} ->
+          {:error, {:api_error, status, error_body}}
+
+        {:error, reason} ->
+          {:error, {:http_error, reason}}
+      end
     end
   end
 
