@@ -8,7 +8,7 @@ defmodule SocialScribeWeb.MeetingLive.Show do
   alias SocialScribe.Meetings
   alias SocialScribe.Automations
   alias SocialScribe.Accounts
-  alias SocialScribe.HubspotApi
+  alias SocialScribe.HubspotApiBehaviour, as: HubspotApi
   alias SocialScribe.HubspotSuggestions
 
   @impl true
