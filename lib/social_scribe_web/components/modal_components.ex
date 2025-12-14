@@ -342,7 +342,7 @@ defmodule SocialScribeWeb.ModalComponents do
           >
             1 update selected
           </span>
-          <button type="button" class="text-sm text-hubspot-hide hover:text-hubspot-hide-hover font-medium">
+          <button type="button" class="text-xs text-hubspot-hide hover:text-hubspot-hide-hover font-medium">
             Hide details
           </button>
         </div>
@@ -387,7 +387,7 @@ defmodule SocialScribeWeb.ModalComponents do
         </div>
 
         <div class="mt-3 grid grid-cols-[1fr_32px_1fr] items-start gap-6">
-          <button type="button" class="text-sm text-hubspot-link hover:text-hubspot-link-hover font-medium justify-self-start">
+          <button type="button" class="text-xs text-hubspot-link hover:text-hubspot-link-hover font-medium justify-self-start">
             Update mapping
           </button>
           <span></span>
