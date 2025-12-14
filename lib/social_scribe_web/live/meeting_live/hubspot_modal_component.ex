@@ -17,10 +17,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
         </p>
       </div>
 
-      <%= if @step == :success do %>
-        <.success_step contact={@selected_contact} applied_count={@applied_count} patch={@patch} />
-      <% else %>
-        <.contact_select
+      <.contact_select
           selected_contact={@selected_contact}
           contacts={@contacts}
           loading={@searching}
@@ -30,14 +27,13 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
           error={@error}
         />
 
-        <%= if @selected_contact do %>
-          <.suggestions_section
-            suggestions={@suggestions}
-            loading={@loading}
-            myself={@myself}
-            patch={@patch}
-          />
-        <% end %>
+      <%= if @selected_contact do %>
+        <.suggestions_section
+          suggestions={@suggestions}
+          loading={@loading}
+          myself={@myself}
+          patch={@patch}
+        />
       <% end %>
     </div>
     """
@@ -85,27 +81,6 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     """
   end
 
-  attr :contact, :map, required: true
-  attr :applied_count, :integer, required: true
-  attr :patch, :string, required: true
-
-  defp success_step(assigns) do
-    ~H"""
-    <.success_message title="Updates Applied!">
-      Successfully updated {@applied_count} field(s) for
-      <span class="font-medium">{@contact.firstname} {@contact.lastname}</span>
-      <:actions>
-        <.link
-          patch={@patch}
-          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-        >
-          Done
-        </.link>
-      </:actions>
-    </.success_message>
-    """
-  end
-
   @impl true
   def update(assigns, socket) do
     socket =
@@ -121,7 +96,6 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
       |> assign_new(:searching, fn -> false end)
       |> assign_new(:dropdown_open, fn -> false end)
       |> assign_new(:error, fn -> nil end)
-      |> assign_new(:applied_count, fn -> 0 end)
 
     {:ok, socket}
   end

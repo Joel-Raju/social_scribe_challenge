@@ -528,7 +528,7 @@ defmodule SocialScribe.AccountsTest do
       user = user_fixture()
       credential = hubspot_credential_fixture(%{user_id: user.id})
 
-      found_credential = Accounts.get_user_hubspot_credential(user)
+      found_credential = Accounts.get_user_hubspot_credential(user.id)
 
       assert found_credential.id == credential.id
       assert found_credential.provider == "hubspot"
@@ -537,7 +537,7 @@ defmodule SocialScribe.AccountsTest do
     test "get_user_hubspot_credential/1 returns nil when no credential exists" do
       user = user_fixture()
 
-      assert Accounts.get_user_hubspot_credential(user) == nil
+      assert Accounts.get_user_hubspot_credential(user.id) == nil
     end
 
     test "list_user_credentials/2 filters by hubspot provider" do
