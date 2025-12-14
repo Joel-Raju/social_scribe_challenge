@@ -126,12 +126,12 @@ defmodule SocialScribeWeb.MeetingLive.Show do
   def handle_info({:apply_hubspot_updates, updates, contact, credential}, socket) do
     case HubspotApi.update_contact(credential, contact.id, updates) do
       {:ok, _updated_contact} ->
-        send_update(SocialScribeWeb.MeetingLive.HubspotModalComponent,
-          id: "hubspot-modal",
-          step: :success,
-          applied_count: map_size(updates),
-          loading: false
-        )
+        socket =
+          socket
+          |> put_flash(:info, "Successfully updated #{map_size(updates)} field(s) in HubSpot")
+          |> push_patch(to: ~p"/dashboard/meetings/#{socket.assigns.meeting}")
+
+        {:noreply, socket}
 
       {:error, reason} ->
         send_update(SocialScribeWeb.MeetingLive.HubspotModalComponent,
@@ -139,9 +139,9 @@ defmodule SocialScribeWeb.MeetingLive.Show do
           error: "Failed to update contact: #{inspect(reason)}",
           loading: false
         )
-    end
 
-    {:noreply, socket}
+        {:noreply, socket}
+    end
   end
 
   defp normalize_contact(contact) do
