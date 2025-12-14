@@ -11,7 +11,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     ~H"""
     <div class="space-y-6">
       <div>
-        <h2 id={"#{@modal_id}-title"} class="text-2xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
+        <h2 id={"#{@modal_id}-title"} class="text-xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
         <p id={"#{@modal_id}-description"} class="mt-2 text-lg font-normal leading-7 text-slate-500">
           Here are suggested updates to sync with your integrations based on this meeting
         </p>
@@ -184,34 +184,38 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
   end
 
   @impl true
-  def handle_event("toggle_suggestion", %{"apply" => applied_fields}, socket) do
+  def handle_event("toggle_suggestion", params, socket) do
+    applied_fields = Map.get(params, "apply", %{})
+    values = Map.get(params, "values", %{})
     checked_fields = Map.keys(applied_fields)
 
     updated_suggestions =
       Enum.map(socket.assigns.suggestions, fn suggestion ->
-        if suggestion.field in checked_fields do
-          %{suggestion | apply: true}
-        else
-          %{suggestion | apply: false}
-        end
+        apply? = suggestion.field in checked_fields
+
+        suggestion =
+          case Map.get(values, suggestion.field) do
+            nil -> suggestion
+            new_value -> %{suggestion | new_value: new_value}
+          end
+
+        %{suggestion | apply: apply?}
       end)
 
     {:noreply, assign(socket, suggestions: updated_suggestions)}
   end
 
   @impl true
-  def handle_event("toggle_suggestion", _params, socket) do
-    updated_suggestions =
-      Enum.map(socket.assigns.suggestions, fn suggestion ->
-        %{suggestion | apply: false}
-      end)
-
-    {:noreply, assign(socket, suggestions: updated_suggestions)}
-  end
-
-  @impl true
-  def handle_event("apply_updates", %{"apply" => updates}, socket) do
+  def handle_event("apply_updates", %{"apply" => selected, "values" => values}, socket) do
     socket = assign(socket, loading: true, error: nil)
+
+    updates =
+      selected
+      |> Map.keys()
+      |> Enum.reduce(%{}, fn field, acc ->
+        Map.put(acc, field, Map.get(values, field, ""))
+      end)
+
     send(self(), {:apply_hubspot_updates, updates, socket.assigns.selected_contact, socket.assigns.credential})
     {:noreply, socket}
   end

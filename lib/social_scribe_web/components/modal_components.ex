@@ -337,8 +337,11 @@ defmodule SocialScribeWeb.ModalComponents do
 
         <div class="flex items-center gap-4 pt-0.5">
           <span
-            :if={@suggestion.apply}
-            class="inline-flex items-center rounded-full bg-hubspot-pill px-3 py-1 text-xs font-semibold text-hubspot-pill-text"
+            class={[
+              "inline-flex items-center rounded-full bg-hubspot-pill px-3 py-1 text-xs font-semibold text-hubspot-pill-text",
+              if(@suggestion.apply, do: "opacity-100", else: "opacity-0 pointer-events-none")
+            ]}
+            aria-hidden={to_string(!@suggestion.apply)}
           >
             1 update selected
           </span>
@@ -356,7 +359,7 @@ defmodule SocialScribeWeb.ModalComponents do
             id={"suggestion-apply-#{@suggestion.field}"}
             type="checkbox"
             name={"apply[#{@suggestion.field}]"}
-            value={@suggestion.new_value}
+            value="1"
             checked={@suggestion.apply}
             class="absolute -left-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-[3px] border-slate-300 text-hubspot-checkbox accent-hubspot-checkbox focus:ring-0 focus:ring-offset-0 cursor-pointer"
           />
@@ -379,7 +382,7 @@ defmodule SocialScribeWeb.ModalComponents do
 
             <input
               type="text"
-              readonly
+              name={"values[#{@suggestion.field}]"}
               value={@suggestion.new_value}
               class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
             />
