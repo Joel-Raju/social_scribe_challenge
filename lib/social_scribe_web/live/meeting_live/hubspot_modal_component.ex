@@ -6,12 +6,13 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
   @impl true
   def render(assigns) do
     assigns = assign(assigns, :patch, ~p"/dashboard/meetings/#{assigns.meeting}")
+    assigns = assign_new(assigns, :modal_id, fn -> "hubspot-modal-wrapper" end)
 
     ~H"""
     <div class="space-y-6">
       <div>
-        <h2 class="text-2xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
-        <p class="mt-2 text-lg font-normal leading-7 text-slate-500">
+        <h2 id={"#{@modal_id}-title"} class="text-2xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
+        <p id={"#{@modal_id}-description"} class="mt-2 text-lg font-normal leading-7 text-slate-500">
           Here are suggested updates to sync with your integrations based on this meeting
         </p>
       </div>
@@ -72,7 +73,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
             <.modal_footer
               cancel_patch={@patch}
               submit_text="Update HubSpot"
-              submit_class="bg-[#00B669] hover:bg-[#009A59]"
+              submit_class="bg-hubspot-button hover:bg-hubspot-button-hover"
               loading={@loading}
               loading_text="Updating..."
               info_text={"1 object, #{@selected_count} fields in 1 integration selected to update"}

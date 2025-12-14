@@ -3,6 +3,7 @@ defmodule SocialScribeWeb.MeetingLive.Show do
 
   import SocialScribeWeb.PlatformLogo
   import SocialScribeWeb.ClipboardButton
+  import SocialScribeWeb.ModalComponents, only: [hubspot_modal: 1]
 
   alias SocialScribe.Meetings
   alias SocialScribe.Automations

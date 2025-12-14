@@ -32,18 +32,23 @@ defmodule SocialScribeWeb.ModalComponents do
   attr :query, :string, default: ""
   attr :target, :any, default: nil
   attr :error, :string, default: nil
+  attr :id, :string, default: "contact-select"
 
   def contact_select(assigns) do
     ~H"""
     <div class="space-y-1">
-      <label class="block text-sm font-medium text-slate-700">Select Contact</label>
+      <label for={"#{@id}-input"} class="block text-sm font-medium text-slate-700">Select Contact</label>
       <div class="relative">
         <%= if @selected_contact do %>
           <button
             type="button"
             phx-click="toggle_contact_dropdown"
             phx-target={@target}
-            class="relative w-full bg-white border border-[#CACDCC] rounded-lg pl-3 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-expanded={to_string(@open)}
+            aria-controls={"#{@id}-listbox"}
+            class="relative w-full bg-white border border-hubspot-input rounded-lg pl-1.5 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           >
             <span class="flex items-center">
               <.avatar firstname={@selected_contact.firstname} lastname={@selected_contact.lastname} size={:sm} />
@@ -52,12 +57,13 @@ defmodule SocialScribeWeb.ModalComponents do
               </span>
             </span>
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-              <.icon name="hero-chevron-up-down" class="h-5 w-5 text-[#686F6F]" />
+              <.icon name="hero-chevron-up-down" class="h-5 w-5 text-hubspot-icon" />
             </span>
           </button>
         <% else %>
           <div class="relative">
             <input
+              id={"#{@id}-input"}
               type="text"
               name="contact_query"
               value={@query}
@@ -67,13 +73,17 @@ defmodule SocialScribeWeb.ModalComponents do
               phx-focus="open_contact_dropdown"
               phx-debounce="150"
               autocomplete="off"
-              class="w-full bg-white border border-[#CACDCC] rounded-lg pl-3 pr-10 py-2.5 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={to_string(@open)}
+              aria-controls={"#{@id}-listbox"}
+              class="w-full bg-white border border-hubspot-input rounded-lg pl-[3px] pr-10 py-[5px] text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <%= if @loading do %>
-                <.icon name="hero-arrow-path" class="h-5 w-5 text-[#686F6F] animate-spin" />
+                <.icon name="hero-arrow-path" class="h-5 w-5 text-hubspot-icon animate-spin" />
               <% else %>
-                <.icon name="hero-chevron-up-down" class="h-5 w-5 text-[#686F6F]" />
+                <.icon name="hero-chevron-up-down" class="h-5 w-5 text-hubspot-icon" />
               <% end %>
             </span>
           </div>
@@ -81,6 +91,8 @@ defmodule SocialScribeWeb.ModalComponents do
 
         <div
           :if={@open && (Enum.any?(@contacts) || @loading || @query != "")}
+          id={"#{@id}-listbox"}
+          role="listbox"
           class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
         >
           <div :if={@loading} class="px-4 py-2 text-sm text-gray-500">
@@ -95,6 +107,8 @@ defmodule SocialScribeWeb.ModalComponents do
             phx-click="select_contact"
             phx-value-id={contact.id}
             phx-target={@target}
+            role="option"
+            aria-selected={"false"}
             class="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center space-x-3 cursor-pointer"
           >
             <.avatar firstname={contact.firstname} lastname={contact.lastname} size={:sm} />
@@ -177,7 +191,7 @@ defmodule SocialScribeWeb.ModalComponents do
 
     ~H"""
     <div class={[
-      "rounded-full bg-[#C6CCD1] flex items-center justify-center font-semibold text-[#0C1216] flex-shrink-0",
+      "rounded-full bg-hubspot-avatar flex items-center justify-center font-semibold text-hubspot-avatar-text flex-shrink-0",
       @size_class,
       @class
     ]}>
@@ -275,7 +289,7 @@ defmodule SocialScribeWeb.ModalComponents do
           value={@current_value || ""}
           placeholder="No existing value"
           class={[
-            "block w-full shadow-sm text-sm bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2",
+            "block w-full shadow-sm text-sm bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2",
             if(@current_value && @current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
           ]}
         />
@@ -288,7 +302,7 @@ defmodule SocialScribeWeb.ModalComponents do
           type="text"
           readonly
           value={@new_value}
-          class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
+          class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
     </div>
@@ -307,7 +321,7 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def suggestion_card(assigns) do
     ~H"""
-    <div class={["bg-[#f5f8f7] rounded-2xl p-6 mb-4", @class]}>
+    <div class={["bg-hubspot-card rounded-2xl p-6 mb-4", @class]}>
       <div class="flex items-start justify-between">
         <div class="flex items-start gap-3">
           <div class="flex items-center h-5 pt-0.5">
@@ -315,7 +329,7 @@ defmodule SocialScribeWeb.ModalComponents do
               type="checkbox"
               checked={@suggestion.apply}
               phx-click={JS.dispatch("click", to: "#suggestion-apply-#{@suggestion.field}")}
-              class="h-4 w-4 rounded-[3px] border-slate-300 text-[#0871E8] accent-[#0871E8] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+              class="h-4 w-4 rounded-[3px] border-slate-300 text-hubspot-checkbox accent-hubspot-checkbox focus:ring-0 focus:ring-offset-0 cursor-pointer"
             />
           </div>
           <div class="text-sm font-semibold text-slate-900 leading-5">{@suggestion.label}</div>
@@ -324,11 +338,11 @@ defmodule SocialScribeWeb.ModalComponents do
         <div class="flex items-center gap-4 pt-0.5">
           <span
             :if={@suggestion.apply}
-            class="inline-flex items-center rounded-full bg-[#E1E5EA] px-3 py-1 text-xs font-semibold text-[#121418]"
+            class="inline-flex items-center rounded-full bg-hubspot-pill px-3 py-1 text-xs font-semibold text-hubspot-pill-text"
           >
             1 update selected
           </span>
-          <button type="button" class="text-sm text-[#676B70] hover:text-[#565A5E] font-medium">
+          <button type="button" class="text-sm text-hubspot-hide hover:text-hubspot-hide-hover font-medium">
             Hide details
           </button>
         </div>
@@ -344,22 +358,22 @@ defmodule SocialScribeWeb.ModalComponents do
             name={"apply[#{@suggestion.field}]"}
             value={@suggestion.new_value}
             checked={@suggestion.apply}
-            class="absolute -left-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-[3px] border-slate-300 text-[#0871E8] accent-[#0871E8] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+            class="absolute -left-8 top-1/2 -translate-y-1/2 h-4 w-4 rounded-[3px] border-slate-300 text-hubspot-checkbox accent-hubspot-checkbox focus:ring-0 focus:ring-offset-0 cursor-pointer"
           />
 
-          <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+          <div class="grid grid-cols-[1fr_32px_1fr] items-center gap-6">
             <input
               type="text"
               readonly
               value={@suggestion.current_value || ""}
               placeholder="No existing value"
               class={[
-                "block w-full shadow-sm text-sm bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2",
+                "block w-full shadow-sm text-sm bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2",
                 if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
               ]}
             />
 
-            <div class="text-[#6F7271]">
+            <div class="w-8 flex justify-center text-hubspot-arrow">
               <.icon name="hero-arrow-long-right" class="h-8 w-8" />
             </div>
 
@@ -367,13 +381,13 @@ defmodule SocialScribeWeb.ModalComponents do
               type="text"
               readonly
               value={@suggestion.new_value}
-              class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-[#CACDCC] rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
+              class="block w-full shadow-sm text-sm text-slate-900 bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
 
-        <div class="mt-3 grid grid-cols-[1fr_auto_1fr] items-center">
-          <button type="button" class="text-sm text-[#216FCC] hover:text-[#1B5CB0] font-medium justify-self-start">
+        <div class="mt-3 grid grid-cols-[1fr_32px_1fr] items-start gap-6">
+          <button type="button" class="text-sm text-hubspot-link hover:text-hubspot-link-hover font-medium justify-self-start">
             Update mapping
           </button>
           <span></span>
@@ -381,7 +395,7 @@ defmodule SocialScribeWeb.ModalComponents do
             Found in transcript
             <span
               :if={@suggestion[:context]}
-              class="ml-1 text-[#216FCC] hover:underline cursor-help"
+              class="ml-1 text-hubspot-link hover:underline cursor-help"
               title={@suggestion.context}
             >
               (hover for context)
@@ -446,7 +460,7 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def modal_footer(assigns) do
     ~H"""
-    <div class={["relative pt-6 mt-6 flex items-center justify-between -mx-14 px-14", @class]}>
+    <div class={["relative pt-6 mt-6 flex items-center justify-between -mx-10 px-10", @class]}>
       <div class="absolute left-0 right-0 top-0 border-t border-slate-200"></div>
       <div :if={@info_text} class="text-xs text-slate-500">
         {@info_text}
@@ -457,7 +471,7 @@ defmodule SocialScribeWeb.ModalComponents do
           :if={@cancel_patch}
           type="button"
           phx-click={Phoenix.LiveView.JS.patch(@cancel_patch)}
-          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-[#151515] bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-hubspot-cancel bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Cancel
         </button>
@@ -465,7 +479,7 @@ defmodule SocialScribeWeb.ModalComponents do
           :if={@cancel_click}
           type="button"
           phx-click={@cancel_click}
-          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-[#151515] bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-5 py-2.5 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-hubspot-cancel bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
           Cancel
         </button>
@@ -521,5 +535,102 @@ defmodule SocialScribeWeb.ModalComponents do
     ~H"""
     <p class={["text-red-600 text-sm", @class]}>{@message}</p>
     """
+  end
+
+  @doc """
+  Renders a HubSpot-styled modal wrapper.
+
+  This is a specialized modal with HubSpot-specific styling:
+  - Custom overlay color
+  - Reduced padding
+  - No close button (relies on Cancel button in footer)
+
+  ## Examples
+
+      <.hubspot_modal id="hubspot-modal" show on_cancel={JS.patch(~p"/back")}>
+        Modal content here
+      </.hubspot_modal>
+  """
+  attr :id, :string, required: true
+  attr :show, :boolean, default: false
+  attr :on_cancel, JS, default: %JS{}
+  slot :inner_block, required: true
+
+  def hubspot_modal(assigns) do
+    ~H"""
+    <div
+      id={@id}
+      phx-mounted={@show && show_modal(@id)}
+      phx-remove={hide_modal(@id)}
+      data-cancel={JS.exec(@on_cancel, "phx-remove")}
+      class="relative z-50 hidden"
+    >
+      <div id={"#{@id}-bg"} class="bg-hubspot-overlay/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        class="fixed inset-0 overflow-y-auto"
+        aria-labelledby={"#{@id}-title"}
+        aria-describedby={"#{@id}-description"}
+        role="dialog"
+        aria-modal="true"
+        tabindex="0"
+      >
+        <div class="flex min-h-full items-center justify-center">
+          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+            <.focus_wrap
+              id={"#{@id}-container"}
+              phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
+              phx-key="escape"
+              phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
+              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white px-10 py-7 shadow-lg ring-1 transition"
+            >
+              <div id={"#{@id}-content"}>
+                {render_slot(@inner_block)}
+              </div>
+            </.focus_wrap>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  defp show_modal(js \\ %JS{}, id) when is_binary(id) do
+    js
+    |> JS.show(to: "##{id}")
+    |> JS.show(
+      to: "##{id}-bg",
+      time: 300,
+      transition: {"transition-all ease-out duration-300", "opacity-0", "opacity-100"}
+    )
+    |> JS.show(
+      to: "##{id}-container",
+      time: 300,
+      transition:
+        {"transition-all ease-out duration-300",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+         "opacity-100 translate-y-0 sm:scale-100"}
+    )
+    |> JS.add_class("overflow-hidden", to: "body")
+    |> JS.focus_first(to: "##{id}-container")
+  end
+
+  defp hide_modal(js \\ %JS{}, id) do
+    js
+    |> JS.hide(
+      to: "##{id}-bg",
+      time: 200,
+      transition: {"transition-all ease-in duration-200", "opacity-100", "opacity-0"}
+    )
+    |> JS.hide(
+      to: "##{id}-container",
+      time: 200,
+      transition:
+        {"transition-all ease-in duration-200",
+         "opacity-100 translate-y-0 sm:scale-100",
+         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"}
+    )
+    |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
+    |> JS.remove_class("overflow-hidden", to: "body")
+    |> JS.pop_focus()
   end
 end

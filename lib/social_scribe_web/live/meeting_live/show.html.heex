@@ -155,7 +155,7 @@
   />
 </.modal>
 
-<.modal
+<.hubspot_modal
   :if={@live_action == :hubspot && @hubspot_credential}
   id="hubspot-modal-wrapper"
   show
@@ -166,5 +166,6 @@
     id="hubspot-modal"
     meeting={@meeting}
     credential={@hubspot_credential}
+    modal_id="hubspot-modal-wrapper"
   />
-</.modal>
+</.hubspot_modal>
