@@ -46,6 +46,24 @@
                   meeting.meeting_participants
                 )}
               </p>
+              <p class="text-xs text-slate-500 mt-1 ">
+                <% 
+                  names =
+                    meeting.meeting_participants
+                    |> Enum.map(fn p ->
+                      name = p.name || ""
+                      if name == "", do: "Unknown", else: name
+                    end)
+
+                  shown = Enum.take(names, 3)
+                  remaining = max(length(names) - length(shown), 0)
+                %>
+                Attendees:
+                {Enum.join(shown, ", ")}
+                <%= if remaining > 0 do %>
+                  +{remaining} more
+                <% end %>
+              </p>
             </div>
             <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
               <.link

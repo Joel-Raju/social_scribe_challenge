@@ -77,7 +77,8 @@ defmodule SocialScribe.HubspotSuggestions do
               label: Map.get(@field_labels, suggestion.field, suggestion.field),
               current_value: nil,
               new_value: suggestion.value,
-              context: suggestion.context,
+              context: Map.get(suggestion, :context),
+              timestamp: Map.get(suggestion, :timestamp),
               apply: true,
               has_change: true
             }

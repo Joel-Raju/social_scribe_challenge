@@ -48,7 +48,7 @@ defmodule SocialScribeWeb.ModalComponents do
             aria-haspopup="listbox"
             aria-expanded={to_string(@open)}
             aria-controls={"#{@id}-listbox"}
-            class="relative w-full bg-white border border-hubspot-input rounded-lg pl-1.5 pr-10 py-2.5 text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            class="relative w-full bg-white border border-hubspot-input rounded-lg pl-1.5 pr-10 py-[5px] text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
           >
             <span class="flex items-center">
               <.avatar firstname={@selected_contact.firstname} lastname={@selected_contact.lastname} size={:sm} />
@@ -77,7 +77,7 @@ defmodule SocialScribeWeb.ModalComponents do
               aria-autocomplete="list"
               aria-expanded={to_string(@open)}
               aria-controls={"#{@id}-listbox"}
-              class="w-full bg-white border border-hubspot-input rounded-lg pl-[3px] pr-10 py-[5px] text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              class="w-full bg-white border border-hubspot-input rounded-lg pl-2 pr-10 py-[5px] text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <%= if @loading do %>
@@ -90,11 +90,24 @@ defmodule SocialScribeWeb.ModalComponents do
         <% end %>
 
         <div
-          :if={@open && (Enum.any?(@contacts) || @loading || @query != "")}
+          :if={@open && (@selected_contact || Enum.any?(@contacts) || @loading || @query != "")}
           id={"#{@id}-listbox"}
           role="listbox"
+          phx-click-away="close_contact_dropdown"
+          phx-target={@target}
           class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
         >
+          <button
+            :if={@selected_contact}
+            type="button"
+            phx-click="clear_contact"
+            phx-target={@target}
+            role="option"
+            aria-selected={"false"}
+            class="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm text-slate-700 cursor-pointer"
+          >
+            Clear selection
+          </button>
           <div :if={@loading} class="px-4 py-2 text-sm text-gray-500">
             Searching...
           </div>
@@ -182,8 +195,8 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def avatar(assigns) do
     size_classes = %{
-      sm: "h-6 w-6 text-xs",
-      md: "h-8 w-8 text-xs",
+      sm: "h-6 w-6 text-[10px]",
+      md: "h-8 w-8 text-[10px]",
       lg: "h-10 w-10 text-sm"
     }
 
@@ -335,10 +348,10 @@ defmodule SocialScribeWeb.ModalComponents do
           <div class="text-sm font-semibold text-slate-900 leading-5">{@suggestion.label}</div>
         </div>
 
-        <div class="flex items-center gap-4 pt-0.5">
+        <div class="flex items-center gap-3 pt-0.5">
           <span
             class={[
-              "inline-flex items-center rounded-full bg-hubspot-pill px-3 py-1 text-xs font-semibold text-hubspot-pill-text",
+              "inline-flex items-center rounded-full bg-hubspot-pill px-2 py-1 text-xs font-medium text-hubspot-pill-text",
               if(@suggestion.apply, do: "opacity-100", else: "opacity-0 pointer-events-none")
             ]}
             aria-hidden={to_string(!@suggestion.apply)}
@@ -351,10 +364,10 @@ defmodule SocialScribeWeb.ModalComponents do
         </div>
       </div>
 
-      <div class="mt-4 pl-8">
+      <div class="mt-2 pl-8">
         <div class="text-sm font-medium text-slate-700 leading-5 ml-1">{@suggestion.label}</div>
 
-        <div class="relative mt-3">
+        <div class="relative mt-2">
           <input
             id={"suggestion-apply-#{@suggestion.field}"}
             type="checkbox"
@@ -371,13 +384,13 @@ defmodule SocialScribeWeb.ModalComponents do
               value={@suggestion.current_value || ""}
               placeholder="No existing value"
               class={[
-                "block w-full shadow-sm text-sm bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2",
-                if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
+                "block w-full shadow-sm text-sm bg-white border border-gray-300 rounded-[7px] py-1.5 px-2",
+                if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-gray-500", else: "text-gray-400")
               ]}
             />
 
             <div class="w-8 flex justify-center text-hubspot-arrow">
-              <.icon name="hero-arrow-long-right" class="h-8 w-8" />
+              <.icon name="hero-arrow-long-right" class="h-7 w-7" />
             </div>
 
             <input
@@ -394,16 +407,12 @@ defmodule SocialScribeWeb.ModalComponents do
             Update mapping
           </button>
           <span></span>
-          <span class="text-xs text-slate-500 justify-self-start">
-            Found in transcript
-            <span
-              :if={@suggestion[:context]}
-              class="ml-1 text-hubspot-link hover:underline cursor-help"
-              title={@suggestion.context}
+          <span :if={@suggestion[:timestamp]} class="text-xs text-slate-500 justify-self-start">Found in transcript<span
+              class="text-hubspot-link hover:underline cursor-help"
+              title={@suggestion[:context]}
             >
-              (hover for context)
-            </span>
-          </span>
+              ({@suggestion[:timestamp]})
+            </span></span>
         </div>
       </div>
     </div>
@@ -457,6 +466,7 @@ defmodule SocialScribeWeb.ModalComponents do
   attr :submit_text, :string, default: "Submit"
   attr :submit_class, :string, default: "bg-green-600 hover:bg-green-700"
   attr :loading, :boolean, default: false
+  attr :disabled, :boolean, default: false
   attr :loading_text, :string, default: "Processing..."
   attr :info_text, :string, default: nil
   attr :class, :string, default: nil
@@ -488,7 +498,7 @@ defmodule SocialScribeWeb.ModalComponents do
         </button>
         <button
           type="submit"
-          disabled={@loading}
+          disabled={@loading || @disabled}
           class={
             "px-5 py-2.5 rounded-lg shadow-sm text-sm font-medium text-white " <>
               @submit_class <> " disabled:opacity-50"

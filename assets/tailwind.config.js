@@ -30,7 +30,7 @@ module.exports = {
           cancel: "#151515",
           button: "#00B669",
           "button-hover": "#009A59",
-          arrow: "#6F7271",
+          arrow: "#BBBCBB",
           avatar: "#C6CCD1",
           "avatar-text": "#0C1216",
         }
