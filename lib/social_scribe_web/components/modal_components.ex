@@ -384,13 +384,13 @@ defmodule SocialScribeWeb.ModalComponents do
               value={@suggestion.current_value || ""}
               placeholder="No existing value"
               class={[
-                "block w-full shadow-sm text-sm bg-white border border-hubspot-input rounded-[7px] py-1.5 px-2",
-                if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-slate-500", else: "text-slate-400")
+                "block w-full shadow-sm text-sm bg-white border border-gray-300 rounded-[7px] py-1.5 px-2",
+                if(@suggestion.current_value && @suggestion.current_value != "", do: "line-through text-gray-500", else: "text-gray-400")
               ]}
             />
 
             <div class="w-8 flex justify-center text-hubspot-arrow">
-              <.icon name="hero-arrow-long-right" class="h-8 w-8" />
+              <.icon name="hero-arrow-long-right" class="h-7 w-7" />
             </div>
 
             <input
