@@ -405,15 +405,12 @@ defmodule SocialScribeWeb.ModalComponents do
             Update mapping
           </button>
           <span></span>
-          <span :if={@suggestion[:timestamp]} class="text-xs text-slate-500 justify-self-start">
-            Found in transcript
-            <span
-              class="ml-1 text-hubspot-link hover:underline cursor-help"
+          <span :if={@suggestion[:timestamp]} class="text-xs text-slate-500 justify-self-start">Found in transcript<span
+              class="text-hubspot-link hover:underline cursor-help"
               title={@suggestion[:context]}
             >
               ({@suggestion[:timestamp]})
-            </span>
-          </span>
+            </span></span>
         </div>
       </div>
     </div>
