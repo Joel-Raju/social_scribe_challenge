@@ -81,7 +81,7 @@ steps:
       - '--add-cloudsql-instances'
       - '$PROJECT_ID:${_REGION}:social-scribe-db'
       - '--set-env-vars'
-      - 'PHX_SERVER=true'
+      - 'PHX_SERVER=true,PHX_HOST=social-scribe-1061394162561.us-central1.run.app'
       - '--set-secrets'
       - 'DATABASE_URL=DATABASE_URL:latest,SECRET_KEY_BASE=SECRET_KEY_BASE:latest,GOOGLE_CLIENT_ID=GOOGLE_CLIENT_ID:latest,GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET:latest,HUBSPOT_CLIENT_ID=HUBSPOT_CLIENT_ID:latest,HUBSPOT_CLIENT_SECRET=HUBSPOT_CLIENT_SECRET:latest,RECALL_API_KEY=RECALL_API_KEY:latest,RECALL_REGION=RECALL_REGION:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest'
 
