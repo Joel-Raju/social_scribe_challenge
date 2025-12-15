@@ -123,7 +123,7 @@ defmodule SocialScribe.Bots do
     join_minute_offset =
       Map.get(user_bot_preference, :join_minute_offset, 2)
 
-    with {:ok, %{body: api_response}} <-
+    with {:ok, %{status: status, body: api_response}} when status in 200..299 <-
            RecallApi.create_bot(
              calendar_event.hangout_link,
              DateTime.add(
@@ -131,16 +131,26 @@ defmodule SocialScribe.Bots do
                -join_minute_offset,
                :minute
              )
-           ) do
+           ),
+         %{id: bot_id} <- api_response do
+      status = get_in(api_response, [:status_changes, Access.at(0), :code]) || "ready"
+
       create_recall_bot(%{
         user_id: user.id,
         calendar_event_id: calendar_event.id,
-        recall_bot_id: api_response.id,
+        recall_bot_id: bot_id,
         meeting_url: calendar_event.hangout_link,
-        status: api_response.status_changes |> List.first() |> Map.get(:code)
+        status: status
       })
     else
-      {:error, reason} -> {:error, {:api_error, reason}}
+      {:ok, %{status: status, body: body}} ->
+        {:error, {:api_error, {status, body}}}
+
+      {:error, reason} ->
+        {:error, {:api_error, reason}}
+
+      _ ->
+        {:error, {:api_error, :invalid_response}}
     end
   end
 

@@ -39,11 +39,24 @@ defmodule SocialScribeWeb.HomeLive do
 
   @impl true
   def handle_info({:schedule_bot, event}, socket) do
-    if event.record_meeting do
-      {:ok, _} = Bots.create_and_dispatch_bot(socket.assigns.current_user, event)
-    else
-      {:ok, _} = Bots.cancel_and_delete_bot(event)
-    end
+    socket =
+      if event.record_meeting do
+        case Bots.create_and_dispatch_bot(socket.assigns.current_user, event) do
+          {:ok, _} ->
+            socket
+
+          {:error, reason} ->
+            Logger.error("Failed to create bot: #{inspect(reason)}")
+            put_flash(socket, :error, "Failed to schedule recording bot. Please check your Recall API configuration.")
+        end
+      else
+        case Bots.cancel_and_delete_bot(event) do
+          {:ok, _} -> socket
+          {:error, reason} ->
+            Logger.error("Failed to cancel bot: #{inspect(reason)}")
+            socket
+        end
+      end
 
     {:noreply, socket}
   end
