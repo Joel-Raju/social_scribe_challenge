@@ -11,9 +11,10 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     ~H"""
     <div class="space-y-6">
       <div>
-        <h2 id={"#{@modal_id}-title"} class="text-xl font-semibold tracking-tight text-slate-900">Update in HubSpot</h2>
-        <p id={"#{@modal_id}-description"} class="mt-2 text-lg font-light leading-7 text-slate-500">
-          Here are suggested updates to sync with your integrations based on this meeting
+        <h2 id={"#{@modal_id}-title"} class="text-xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
+        <p id={"#{@modal_id}-description"} class="mt-2 text-base font-light leading-7 text-slate-500">
+          Here are suggested updates to sync with your integrations based on this
+          <span class="block">meeting</span>
         </p>
       </div>
 

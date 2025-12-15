@@ -195,8 +195,8 @@ defmodule SocialScribeWeb.ModalComponents do
 
   def avatar(assigns) do
     size_classes = %{
-      sm: "h-6 w-6 text-xs",
-      md: "h-8 w-8 text-xs",
+      sm: "h-6 w-6 text-[10px]",
+      md: "h-8 w-8 text-[10px]",
       lg: "h-10 w-10 text-sm"
     }
 
@@ -364,10 +364,10 @@ defmodule SocialScribeWeb.ModalComponents do
         </div>
       </div>
 
-      <div class="mt-4 pl-8">
+      <div class="mt-2 pl-8">
         <div class="text-sm font-medium text-slate-700 leading-5 ml-1">{@suggestion.label}</div>
 
-        <div class="relative mt-3">
+        <div class="relative mt-2">
           <input
             id={"suggestion-apply-#{@suggestion.field}"}
             type="checkbox"
