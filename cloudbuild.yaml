@@ -20,7 +20,27 @@ steps:
       - 'push'
       - 'gcr.io/$PROJECT_ID/social-scribe:latest'
 
-  # Run database migrations before deploying
+  # Deploy migration job (creates or updates), then execute
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'jobs'
+      - 'deploy'
+      - 'social-scribe-migrate'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/social-scribe:${_TAG}'
+      - '--region'
+      - '${_REGION}'
+      - '--command'
+      - '/app/bin/migrate'
+      - '--set-cloudsql-instances'
+      - '$PROJECT_ID:${_REGION}:social-scribe-db'
+      - '--service-account'
+      - 'social-scribe-runner@$PROJECT_ID.iam.gserviceaccount.com'
+      - '--set-secrets'
+      - 'DATABASE_URL=DATABASE_URL:latest'
+
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
