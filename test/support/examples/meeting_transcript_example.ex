@@ -1,6 +1,6 @@
 defmodule SocialScribe.MeetingTranscriptExample do
   def meeting_transcript_example do
-    [
+    transcript = [
       %{
         words: [
           %{
@@ -532,5 +532,18 @@ defmodule SocialScribe.MeetingTranscriptExample do
         speaker_id: 100
       }
     ]
+
+    Enum.map(transcript, fn segment ->
+      participant = %{
+        id: segment.speaker_id,
+        name: segment.speaker,
+        is_host: true
+      }
+
+      segment
+      |> Map.put(:participant, participant)
+      |> Map.delete(:speaker)
+      |> Map.delete(:speaker_id)
+    end)
   end
 end
