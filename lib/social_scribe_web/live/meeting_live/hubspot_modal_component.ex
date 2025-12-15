@@ -12,7 +12,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     <div class="space-y-6">
       <div>
         <h2 id={"#{@modal_id}-title"} class="text-xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
-        <p id={"#{@modal_id}-description"} class="mt-2 text-lg font-normal leading-7 text-slate-500">
+        <p id={"#{@modal_id}-description"} class="mt-2 text-lg font-light leading-7 text-slate-500">
           Here are suggested updates to sync with your integrations based on this meeting
         </p>
       </div>
@@ -122,6 +122,11 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
   @impl true
   def handle_event("open_contact_dropdown", _params, socket) do
     {:noreply, assign(socket, dropdown_open: true)}
+  end
+
+  @impl true
+  def handle_event("close_contact_dropdown", _params, socket) do
+    {:noreply, assign(socket, dropdown_open: false)}
   end
 
   @impl true
