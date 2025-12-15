@@ -466,6 +466,7 @@ defmodule SocialScribeWeb.ModalComponents do
   attr :submit_text, :string, default: "Submit"
   attr :submit_class, :string, default: "bg-green-600 hover:bg-green-700"
   attr :loading, :boolean, default: false
+  attr :disabled, :boolean, default: false
   attr :loading_text, :string, default: "Processing..."
   attr :info_text, :string, default: nil
   attr :class, :string, default: nil
@@ -497,7 +498,7 @@ defmodule SocialScribeWeb.ModalComponents do
         </button>
         <button
           type="submit"
-          disabled={@loading}
+          disabled={@loading || @disabled}
           class={
             "px-5 py-2.5 rounded-lg shadow-sm text-sm font-medium text-white " <>
               @submit_class <> " disabled:opacity-50"

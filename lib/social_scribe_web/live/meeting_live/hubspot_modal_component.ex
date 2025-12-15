@@ -11,7 +11,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
     ~H"""
     <div class="space-y-6">
       <div>
-        <h2 id={"#{@modal_id}-title"} class="text-xl font-medium tracking-tight text-slate-900">Update in HubSpot</h2>
+        <h2 id={"#{@modal_id}-title"} class="text-xl font-semibold tracking-tight text-slate-900">Update in HubSpot</h2>
         <p id={"#{@modal_id}-description"} class="mt-2 text-lg font-light leading-7 text-slate-500">
           Here are suggested updates to sync with your integrations based on this meeting
         </p>
@@ -70,6 +70,7 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
               cancel_patch={@patch}
               submit_text="Update HubSpot"
               submit_class="bg-hubspot-button hover:bg-hubspot-button-hover"
+              disabled={@selected_count == 0}
               loading={@loading}
               loading_text="Updating..."
               info_text={"1 object, #{@selected_count} fields in 1 integration selected to update"}
