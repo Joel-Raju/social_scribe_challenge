@@ -346,10 +346,10 @@ defmodule SocialScribeWeb.ModalComponents do
           <div class="text-sm font-semibold text-slate-900 leading-5">{@suggestion.label}</div>
         </div>
 
-        <div class="flex items-center gap-4 pt-0.5">
+        <div class="flex items-center gap-3 pt-0.5">
           <span
             class={[
-              "inline-flex items-center rounded-full bg-hubspot-pill px-3 py-1 text-xs font-semibold text-hubspot-pill-text",
+              "inline-flex items-center rounded-full bg-hubspot-pill px-2 py-1 text-xs font-medium text-hubspot-pill-text",
               if(@suggestion.apply, do: "opacity-100", else: "opacity-0 pointer-events-none")
             ]}
             aria-hidden={to_string(!@suggestion.apply)}
