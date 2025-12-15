@@ -158,6 +158,22 @@ defmodule SocialScribeWeb.MeetingLive.HubspotModalComponent do
   end
 
   @impl true
+  def handle_event("clear_contact", _params, socket) do
+    {:noreply,
+     assign(socket,
+       step: :search,
+       selected_contact: nil,
+       suggestions: [],
+       loading: false,
+       searching: false,
+       dropdown_open: false,
+       contacts: [],
+       query: "",
+       error: nil
+     )}
+  end
+
+  @impl true
   def handle_event("toggle_suggestion", params, socket) do
     applied_fields = Map.get(params, "apply", %{})
     values = Map.get(params, "values", %{})

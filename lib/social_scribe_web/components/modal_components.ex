@@ -90,11 +90,22 @@ defmodule SocialScribeWeb.ModalComponents do
         <% end %>
 
         <div
-          :if={@open && (Enum.any?(@contacts) || @loading || @query != "")}
+          :if={@open && (@selected_contact || Enum.any?(@contacts) || @loading || @query != "")}
           id={"#{@id}-listbox"}
           role="listbox"
           class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
         >
+          <button
+            :if={@selected_contact}
+            type="button"
+            phx-click="clear_contact"
+            phx-target={@target}
+            role="option"
+            aria-selected={"false"}
+            class="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm text-slate-700 cursor-pointer"
+          >
+            Clear selection
+          </button>
           <div :if={@loading} class="px-4 py-2 text-sm text-gray-500">
             Searching...
           </div>
