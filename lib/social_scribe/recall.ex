@@ -74,4 +74,26 @@ defmodule SocialScribe.Recall do
   defp get_recording(recording_id) do
     Tesla.get(client(), "/recording/#{recording_id}")
   end
+
+  @impl SocialScribe.RecallApi
+  def get_bot_participants(recall_bot_id) do
+    with {:ok, %{body: bot_info}} <- get_bot(recall_bot_id),
+         [%{id: recording_id} | _] <- Map.get(bot_info, :recordings, []),
+         {:ok, %{body: recording}} <- get_recording(recording_id),
+         url when is_binary(url) <- get_participants_url(recording) do
+      Tesla.client([{Tesla.Middleware.JSON, engine_opts: [keys: :atoms]}])
+      |> Tesla.get(url)
+    else
+      [] -> {:error, :no_recordings}
+      nil -> {:error, :no_participants_url}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp get_participants_url(recording) do
+    # Try media_shortcuts first (newer API structure)
+    get_in(recording, [:media_shortcuts, :participant_events, :data, :participants_download_url]) ||
+      # Fallback to direct participant_events (older structure)
+      get_in(recording, [:participant_events, :data, :participants_download_url])
+  end
 end

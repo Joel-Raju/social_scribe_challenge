@@ -7,6 +7,7 @@ defmodule SocialScribe.Bots do
   alias SocialScribe.Repo
 
   alias SocialScribe.Bots.RecallBot
+  alias SocialScribe.Bots.UserBotPreference
   alias SocialScribe.RecallApi
 
   @doc """
@@ -118,10 +119,8 @@ defmodule SocialScribe.Bots do
   Orchestrates creating a bot via the API and saving it to the database.
   """
   def create_and_dispatch_bot(user, calendar_event) do
-    user_bot_preference = get_user_bot_preference(user.id) || %{}
-
-    join_minute_offset =
-      Map.get(user_bot_preference, :join_minute_offset, 2)
+    user_bot_preference = get_user_bot_preference(user.id) || %UserBotPreference{}
+    join_minute_offset = user_bot_preference.join_minute_offset
 
     with {:ok, %{status: status, body: api_response}} when status in 200..299 <-
            RecallApi.create_bot(
@@ -175,10 +174,8 @@ defmodule SocialScribe.Bots do
   Orchestrates updating a bot's schedule via the API and saving it to the database.
   """
   def update_bot_schedule(bot, calendar_event) do
-    user_bot_preference = get_user_bot_preference(bot.user_id) || %{}
-
-    join_minute_offset =
-      Map.get(user_bot_preference, :join_minute_offset, 2)
+    user_bot_preference = get_user_bot_preference(bot.user_id) || %UserBotPreference{}
+    join_minute_offset = user_bot_preference.join_minute_offset
 
     with {:ok, %{body: api_response}} <-
            RecallApi.update_bot(
@@ -191,8 +188,6 @@ defmodule SocialScribe.Bots do
       })
     end
   end
-
-  alias SocialScribe.Bots.UserBotPreference
 
   @doc """
   Returns the list of user_bot_preferences.
