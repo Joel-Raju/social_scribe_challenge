@@ -276,8 +276,14 @@ defmodule SocialScribe.MeetingsTest do
 
       transcript_data = meeting_transcript_example()
 
+      # Participants data from Recall.ai participants endpoint
+      participants_data = [
+        %{id: 100, name: "Felipe Gomes Paradas", is_host: true},
+        %{id: 101, name: "John Doe", is_host: false}
+      ]
+
       assert {:ok, meeting} =
-               Meetings.create_meeting_from_recall_data(recall_bot, bot_api_info, transcript_data)
+               Meetings.create_meeting_from_recall_data(recall_bot, bot_api_info, transcript_data, participants_data)
 
       # Verify meeting was created with correct attributes
       assert meeting.title == "Test Meeting"
@@ -292,14 +298,16 @@ defmodule SocialScribe.MeetingsTest do
       assert meeting.meeting_transcript.content["data"] ==
                transcript_data |> Jason.encode!() |> Jason.decode!()
 
-      # Verify participants were created
-      assert length(meeting.meeting_participants) == 1
+      # Verify participants were created (all attendees, not just speakers)
+      assert length(meeting.meeting_participants) == 2
 
-      participant = List.first(meeting.meeting_participants)
+      assert Enum.any?(meeting.meeting_participants, fn p ->
+        p.name == "Felipe Gomes Paradas" and p.is_host == true
+      end)
 
-      assert participant.name == "Felipe Gomes Paradas"
-      assert participant.recall_participant_id == "100"
-      assert participant.is_host == true
+      assert Enum.any?(meeting.meeting_participants, fn p ->
+        p.name == "John Doe" and p.is_host == false
+      end)
     end
   end
 

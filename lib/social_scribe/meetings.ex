@@ -340,10 +340,10 @@ defmodule SocialScribe.Meetings do
   end
 
   @doc """
-  Creates a complete meeting record from Recall.ai bot info and transcript data.
+  Creates a complete meeting record from Recall.ai bot info, transcript data, and participants.
   This should be called when a bot's status is "done".
   """
-  def create_meeting_from_recall_data(%RecallBot{} = recall_bot, bot_api_info, transcript_data) do
+  def create_meeting_from_recall_data(%RecallBot{} = recall_bot, bot_api_info, transcript_data, participants_data) do
     calendar_event = Repo.preload(recall_bot, :calendar_event).calendar_event
 
     Repo.transaction(fn ->
@@ -355,8 +355,8 @@ defmodule SocialScribe.Meetings do
 
       {:ok, _transcript} = create_meeting_transcript(transcript_attrs)
 
-      # Extract participants from transcript data (Recall API format)
-      participants = extract_participants_from_transcript(transcript_data)
+      # Use participants from Recall.ai participants endpoint (includes all attendees, not just speakers)
+      participants = parse_participants_data(participants_data)
 
       Enum.each(participants, fn participant_data ->
         participant_attrs = parse_participant_attrs(meeting, participant_data)
@@ -429,18 +429,18 @@ defmodule SocialScribe.Meetings do
     }
   end
 
-  defp extract_participants_from_transcript(transcript_data) do
-    parsed =
-      case transcript_data do
-        data when is_binary(data) -> Jason.decode!(data, keys: :atoms)
-        data when is_list(data) -> data
-        _ -> []
-      end
+  defp parse_participants_data(participants_data) do
+    # Participants data from Recall.ai participants_download_url
+    # Format: list of participant objects with id, name, is_host, etc.
+    case participants_data do
+      data when is_list(data) ->
+        Enum.uniq_by(data, & &1[:id])
 
-    parsed
-    |> Enum.uniq_by(& &1.participant.id)
-    |> Enum.map(& &1.participant)
+      _ ->
+        []
+    end
   end
+
 
   @doc """
   Generates a prompt for a meeting.
